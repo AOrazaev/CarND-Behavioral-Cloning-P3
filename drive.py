@@ -13,8 +13,11 @@ from flask import Flask
 from io import BytesIO
 
 from keras.models import load_model
+from keras.applications import mobilenet
+from keras.applications.mobilenet import preprocess_input
 import h5py
 from keras import __version__ as keras_version
+from keras.preprocessing import image as kimg
 
 sio = socketio.Server()
 app = Flask(__name__)
@@ -60,10 +63,14 @@ def telemetry(sid, data):
         # The current image from the center camera of the car
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
-        image_array = np.asarray(image)
-        steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
+        image = image.resize((160, 160 + 160))
+        image_array = kimg.img_to_array(image)
+        predicted = model.predict(image_array[None, :, :, :], batch_size=1)
+        print(predicted)
+        steering_angle = float(predicted[0])
 
         throttle = controller.update(float(speed))
+        #throttle = float(predicted[0][1])
 
         print(steering_angle, throttle)
         send_control(steering_angle, throttle)
@@ -119,7 +126,12 @@ if __name__ == '__main__':
         print('You are using Keras version ', keras_version,
               ', but the model was built using ', model_version)
 
-    model = load_model(args.model)
+    model = load_model(
+        args.model,
+        custom_objects={
+            'relu6': mobilenet.relu6,
+            'DepthwiseConv2D': mobilenet.DepthwiseConv2D,
+            'preprocess_input': mobilenet.preprocess_input})
 
     if args.image_folder != '':
         print("Creating image folder at {}".format(args.image_folder))
