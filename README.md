@@ -1,4 +1,4 @@
-#**Behavioral Cloning** 
+# **Behavioral Cloning** 
 
 ## Self-driving car Udacity project
 
@@ -40,6 +40,7 @@ My project includes the following files:
 * [drive.py](./drive.py) for driving the car in autonomous mode
 * [drivenet.h5](./drivenet.h5) containing a trained convolution neural network 
 * [writeup_template.md](./README.md) summarizing the results
+* [video.mp4](./video.mp4) video demonstration of results
 
 ####2. Submission includes functional code
 Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track by executing 
